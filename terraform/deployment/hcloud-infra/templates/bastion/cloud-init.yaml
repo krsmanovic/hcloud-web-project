@@ -1,0 +1,75 @@
+#cloud-config
+
+# users configuration
+users:
+  - name: ${ops_user_name}
+    gecos: Operations user
+    groups: users, admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ops_public_key}
+
+# apt configuration
+package_update: true
+package_upgrade: true
+package_reboot_if_required: false
+
+# disable password authentication for root user
+ssh_pwauth: false
+
+# install required packages
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - dos2unix
+  - git
+  - gnupg-agent
+  - iptraf-ng
+  - jq
+  - mtr
+  - net-tools
+  - nmap
+  - python3-pip
+  - software-properties-common
+  - tree
+  - whois
+  - zip
+
+# set hostname
+hostname: ${server_name}
+
+# render required files
+write_files:
+- path: /home/${ops_user_name}/.ssh/id_rsa
+  encoding: b64
+  owner: ${ops_user_name}:${ops_user_name}
+  permissions: "0600"
+  defer: true
+  content: ${ops_private_key}
+- path: /home/${ops_user_name}/.ssh/id_rsa.pub
+  owner: ${ops_user_name}:${ops_user_name}
+  permissions: "0600"
+  defer: true
+  content: ${ops_public_key}
+
+# execute commands on the first boot
+runcmd:
+  # set bash profile for root user
+  - echo "source /root/.profile" >> /root/.bash_profile
+  # ufw
+  - ufw allow OpenSSH
+  - ufw --force enable
+  # sshd
+  - sed 's/#ClientAliveInterval 0/ClientAliveInterval 60/' -i /etc/ssh/sshd_config
+  - sed 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' -i /etc/ssh/sshd_config
+
+# reboot
+power_state:
+ mode: reboot
+ message: Rebooting the system to finalize software installation
+ timeout: 30
+ condition: True
+
+final_message: "*** System setup is complete, after $UPTIME seconds ***"

@@ -1,0 +1,129 @@
+#cloud-config
+
+# users configuration
+users:
+  - name: ${ops_user_name}
+    gecos: Operations user
+    groups: users, admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ops_public_key}
+
+# apt configuration
+package_update: true
+package_upgrade: true
+package_reboot_if_required: false
+
+# disable password authentication for root user
+ssh_pwauth: false
+
+# install required packages
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - dos2unix
+  - git
+  - gnupg-agent
+  - iptraf-ng
+  - jq
+  - libblockdev-mdraid2 # fix error seen in journal: udisksd[572]: Failed to load the 'mdraid' libblockdev plugin
+  - mtr
+  - net-tools
+  - nginx
+  - nmap
+  - postgresql
+  - postgresql-contrib
+  - software-properties-common
+  - tree
+  - whois
+  - zip
+  # certbot
+  - certbot
+  - python3-certbot-nginx
+  # php modules
+  - imagemagick
+  - php-imagick
+  - php8.1-common
+  - php8.1-pgsql
+  - php8.1-fpm
+  - php8.1-gd
+  - php8.1-curl
+  - php8.1-imagick
+  - php8.1-zip
+  - php8.1-xml
+  - php8.1-mbstring
+  - php8.1-bz2
+  - php8.1-intl
+  - php8.1-bcmath
+  - php8.1-gmp
+
+# set hostname
+hostname: ${server_name}
+
+# render required files
+write_files:
+- path: /tmp/pg.sql
+  encoding: b64
+  owner: postgres:postgres
+  permissions: "0755"
+  defer: true
+  content: ${posgresql_setup}
+- path: /etc/nginx/sites-available/nextcloud.conf
+  encoding: b64
+  content: ${nginx_config}
+- path: /root/nextcloud-install.sh
+  encoding: b64
+  permissions: "0755"
+  defer: true
+  content: ${nextcloud_install}
+- path: /root/nextcloud-add-user.sh
+  permissions: "0755"
+  defer: true
+  content: |
+    sed -rie "s|(www\-data.*)/usr/sbin/nologin$|\1/bin/bash|" /etc/passwd
+    cd /var/www/nextcloud
+    sudo -u www-data OC_PASS=${nc_user_password} php occ user:add --password-from-env --group="users" ${nc_user_name}
+    sed -rie "s|(www\-data.*)/bin/bash$|\1/usr/sbin/nologin|" /etc/passwd
+- path: /root/reboot.sh
+  permissions: "0755"
+  defer: true
+  content: |
+    systemctl reboot
+
+# execute commands on the first boot
+runcmd:
+  # root user setup
+  - echo "source /root/.profile" >> /root/.bash_profile
+  - echo "0 12 * * * /usr/bin/certbot renew --quiet" >> /var/spool/cron/crontabs/root
+  # ufw
+  - ufw allow OpenSSH
+  - ufw allow "Nginx Full"
+  - ufw --force enable
+  # sshd
+  - sed 's/#ClientAliveInterval 0/ClientAliveInterval 60/' -i /etc/ssh/sshd_config
+  - sed 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' -i /etc/ssh/sshd_config
+  # posgresl
+  - sudo -u postgres psql -U postgres postgres -a -f /tmp/pg.sql
+  # fix CR LF control characters in case we originate from Windows dev machine
+  - dos2unix /root/nextcloud-install.sh
+  # php
+  - sed 's/memory_limit = 128M/memory_limit = 512M/g' -i /etc/php/8.1/fpm/php.ini
+  - sed 's/upload_max_filesize = 2M/upload_max_filesize = 1024M/g' -i /etc/php/8.1/fpm/php.ini
+  - sed 's/;clear_env = no/clear_env = no/g' -i /etc/php/8.1/fpm/pool.d/www.conf
+  # nginx
+  - rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+  - ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+  - systemctl restart nginx
+  # certbot
+  - certbot --nginx -d ${domain} --non-interactive --agree-tos -m ${cert_email} --redirect
+
+# reboot
+power_state:
+ mode: reboot
+ message: Rebooting the system to finalize software installation
+ timeout: 30
+ condition: True
+
+final_message: "*** System setup is complete, after $UPTIME seconds ***"
