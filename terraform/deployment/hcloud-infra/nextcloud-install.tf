@@ -1,4 +1,6 @@
-resource "time_sleep" "first_install_and_restart" {
+# wait for cloud-init and reboot to complete
+resource "time_sleep" "nextcloud_install" {
+  depends_on      = [module.nextcloud_server]
   create_duration = "240s"
 
   triggers = {
@@ -6,8 +8,9 @@ resource "time_sleep" "first_install_and_restart" {
   }
 }
 
+# install nextcloud
 resource "null_resource" "nextcloud_install" {
-  depends_on = [time_sleep.first_install_and_restart]
+  depends_on = [time_sleep.nextcloud_install]
 
   provisioner "remote-exec" {
     connection {
@@ -31,7 +34,8 @@ resource "null_resource" "nextcloud_install" {
   }
 }
 
-resource "null_resource" "nextcloud_restart" {
+# remove installation script
+resource "null_resource" "nextcloud_install_cleanup" {
   depends_on = [null_resource.nextcloud_install]
 
   provisioner "remote-exec" {
@@ -46,46 +50,11 @@ resource "null_resource" "nextcloud_restart" {
       bastion_host = module.bastion_server.public_ip
     }
     inline = [
-      "sudo bash -c '/root/reboot.sh'",
-    ]
-
-    # Provisioner doesn't report the exit status, but here we'll explicitly allow failure
-    on_failure = continue
-  }
-
-  triggers = {
-    nextcloud_installation = null_resource.nextcloud_install.id
-  }
-}
-
-resource "time_sleep" "second_restart" {
-  create_duration = "60s"
-
-  triggers = {
-    nextcloud_restart = null_resource.nextcloud_restart.id
-  }
-}
-
-resource "null_resource" "nextcloud_add_user" {
-  depends_on = [time_sleep.second_restart]
-
-  provisioner "remote-exec" {
-    connection {
-      host        = var.nextcloud_private_ip_address
-      port        = 22
-      user        = data.aws_ssm_parameter.ssh_user_name.value
-      type        = "ssh"
-      private_key = module.ssh_key.private_key
-      timeout     = "30s"
-
-      bastion_host = module.bastion_server.public_ip
-    }
-    inline = [
-      "sudo bash -c '/root/nextcloud-add-user.sh'",
+      "sudo bash -c 'rm -rf /root/nextcloud-install.sh'",
     ]
   }
 
   triggers = {
-    nextcloud_restart = null_resource.nextcloud_restart.id
+    nextcloud_install = null_resource.nextcloud_install.id
   }
 }

@@ -21,8 +21,6 @@ data "template_file" "nextcloud_user_data" {
     ops_public_key    = module.ssh_key.public_key
     ops_user_name     = data.aws_ssm_parameter.ssh_user_name.value
     posgresql_setup   = base64encode(data.template_file.nextcloud_postgresql.rendered)
-    nc_user_name      = data.aws_ssm_parameter.nextcloud_user_name.value
-    nc_user_password  = data.aws_ssm_parameter.nextcloud_user_password.value
   }
 }
 
@@ -35,6 +33,8 @@ data "template_file" "nextcloud_install" {
     nc_admin_password = data.aws_ssm_parameter.nextcloud_admin_password.value
     nc_admin_email    = data.aws_ssm_parameter.nextcloud_cert_email.value
     nc_db_pass        = random_password.nextcloud_db_user.result
+    nc_user_name      = data.aws_ssm_parameter.nextcloud_user_name.value
+    nc_user_password  = data.aws_ssm_parameter.nextcloud_user_password.value
   }
 }
 
