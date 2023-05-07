@@ -28,13 +28,14 @@ packages:
   - gnupg-agent
   - iptraf-ng
   - jq
-  - libblockdev-mdraid2 # fix error seen in journal: udisksd[572]: Failed to load the 'mdraid' libblockdev plugin
+  - libblockdev-mdraid2 # udisksd[572]: Failed to load the 'mdraid' libblockdev plugin
   - mtr
   - net-tools
   - nginx
   - nmap
   - postgresql
   - postgresql-contrib
+  - redis-server
   - software-properties-common
   - tree
   - whois
@@ -58,6 +59,7 @@ packages:
   - php8.1-intl
   - php8.1-bcmath
   - php8.1-gmp
+  - php8.1-redis
 
 # set hostname
 hostname: ${server_name}
@@ -78,6 +80,14 @@ write_files:
   permissions: "0755"
   defer: true
   content: ${nextcloud_install}
+- path: /root/redis-tweak
+  permissions: "0644"
+  defer: true
+  content: |
+    # maximum memory allowed for redis
+    maxmemory 1000M
+    # how redis will evice old objects - least recently used
+    maxmemory-policy allkeys-lru
 
 # execute commands on the first boot
 runcmd:
@@ -103,6 +113,15 @@ runcmd:
   - rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
   - ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
   - systemctl restart nginx
+  # redis
+  - mkdir -p /var/run/redis/
+  - chown -R redis:www-data /var/run/redis /var/log/redis
+  - cat /root/redis-tweak | sudo tee -a /etc/redis/redis.conf
+  - rm -rf /root/redis-tweak
+  - sed -i "s/^port.*/port 0/" /etc/redis/redis.conf
+  - sed -i "s|# unixsocket /var/run/redis/redis-server.sock|unixsocket /var/run/redis/redis-server.sock|" /etc/redis/redis.conf
+  - sed -i "s/# unixsocketperm.*/unixsocketperm 770/" /etc/redis/redis.conf
+  - echo 'vm.overcommit_memory = 1' | sudo tee -a /etc/sysctl.conf
   # certbot
   - certbot --nginx -d ${domain} --non-interactive --agree-tos -m ${cert_email} --redirect
 

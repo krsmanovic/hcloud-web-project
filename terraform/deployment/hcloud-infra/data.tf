@@ -27,14 +27,19 @@ data "template_file" "nextcloud_user_data" {
 data "template_file" "nextcloud_install" {
   template = file("${path.module}/templates/nextcloud/nextcloud-install.sh")
   vars = {
-    data_volume_dev   = module.nextcloud_data_volume.volume_device
-    domain            = data.aws_ssm_parameter.nextcloud_domain.value
-    nc_admin_username = data.aws_ssm_parameter.nextcloud_admin_username.value
-    nc_admin_password = data.aws_ssm_parameter.nextcloud_admin_password.value
-    nc_admin_email    = data.aws_ssm_parameter.nextcloud_cert_email.value
-    nc_db_pass        = random_password.nextcloud_db_user.result
-    nc_user_name      = data.aws_ssm_parameter.nextcloud_user_name.value
-    nc_user_password  = data.aws_ssm_parameter.nextcloud_user_password.value
+    data_volume_dev    = module.nextcloud_data_volume.volume_device
+    format_data_volume = var.format_nextcloud_data_volume
+    domain             = data.aws_ssm_parameter.nextcloud_domain.value
+    nc_admin_username  = data.aws_ssm_parameter.nextcloud_admin_username.value
+    nc_admin_password  = data.aws_ssm_parameter.nextcloud_admin_password.value
+    nc_admin_email     = data.aws_ssm_parameter.nextcloud_cert_email.value
+    nc_db_pass         = random_password.nextcloud_db_user.result
+    nc_user_name       = data.aws_ssm_parameter.nextcloud_user_name.value
+    nc_user_password   = data.aws_ssm_parameter.nextcloud_user_password.value
+    nc_mail_user       = data.aws_ssm_parameter.nextcloud_mail_user.value
+    nc_mail_password   = data.aws_ssm_parameter.nextcloud_mail_password.value
+    nc_mail_domain     = data.aws_ssm_parameter.nextcloud_mail_domain.value
+    nc_mail_host       = data.aws_ssm_parameter.nextcloud_mail_host.value
   }
 }
 
@@ -86,6 +91,26 @@ data "aws_ssm_parameter" "nextcloud_user_name" {
 
 data "aws_ssm_parameter" "nextcloud_user_password" {
   name            = "/hcloud/web-project/server/nextcloud/user/password"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "nextcloud_mail_user" {
+  name            = "/hcloud/hcloud-web-project/smtp/user"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "nextcloud_mail_password" {
+  name            = "/hcloud/hcloud-web-project/smtp/password"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "nextcloud_mail_host" {
+  name            = "/hcloud/hcloud-web-project/smtp/host"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "nextcloud_mail_domain" {
+  name            = "/hcloud/hcloud-web-project/smtp/domain"
   with_decryption = true
 }
 

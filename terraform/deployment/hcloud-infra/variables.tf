@@ -88,10 +88,15 @@ variable "app_specific_labels" {
   default     = {}
 }
 
-variable "create_nextcloud_data_volume" {
-  type        = bool
-  description = "Enable or disable creation of data volume on the nextcloud server"
-  default     = false
+variable "format_nextcloud_data_volume" {
+  type        = string
+  description = "Format data volume on the nextcloud server"
+  default     = "no"
+
+  validation {
+    condition     = contains(["yes", "no"], var.format_nextcloud_data_volume)
+    error_message = "Valid values for variable \"format_nextcloud_data_volume\" are: yes, no."
+  }
 }
 
 variable "nextcloud_private_ip_address" {
