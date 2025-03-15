@@ -64,3 +64,14 @@ sed -i "/);/i\  'filelocking.enabled' => true,\n  'memcache.locking' => '\\\OC\\
 # add Strict-Transport-Security headers
 sed -i '/    Header always set X-XSS-Protection "1; mode=block"/a\    # Security hardening\n    Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains"' /var/www/nextcloud/.htaccess
 sudo -u www-data php occ maintenance:update:htaccess
+
+# set maintenance window start
+sudo -u www-data php occ config:system:set maintenance_window_start --value="3" --type=integer
+
+# set php opcache
+# https://gist.github.com/rohankhudedev/1a9c0a3c7fb375f295f9fc11aeb116fe
+cat << EOF > /etc/php/${php_version}/fpm/conf.d/99-custom.ini
+[opcache]
+opcache.interned_strings_buffer=64
+opcache.memory_consumption=512
+EOF

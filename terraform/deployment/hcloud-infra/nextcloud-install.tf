@@ -14,7 +14,7 @@ resource "null_resource" "nextcloud_install" {
 
   provisioner "remote-exec" {
     connection {
-      host        = var.nextcloud_private_ip_address
+      host        = var.private_ip_address_nextcloud
       port        = 22
       user        = data.aws_ssm_parameter.ssh_user_name.value
       type        = "ssh"

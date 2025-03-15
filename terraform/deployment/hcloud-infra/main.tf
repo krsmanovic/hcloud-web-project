@@ -11,6 +11,7 @@ module "network" {
   generic_labels = local.labels
 }
 
+# bastion
 module "bastion_server" {
   source              = "../../modules/hcloud-server"
   server_image        = var.base_images.bastion
@@ -30,6 +31,7 @@ module "bastion_firewall" {
   generic_labels = local.labels
 }
 
+# nextcloud
 module "nextcloud_server" {
   source              = "../../modules/hcloud-server"
   server_image        = var.base_images.nextcloud
@@ -37,7 +39,7 @@ module "nextcloud_server" {
   server_name         = var.server_name.nextcloud
   enable_backups      = true
   network_id          = module.network.network_id
-  server_private_ip   = var.nextcloud_private_ip_address
+  server_private_ip   = var.private_ip_address_nextcloud
   firewall_ids        = module.web_firewall.web_id
   ssh_public_key_name = var.ssh_key_name
   user_data           = data.template_file.nextcloud_user_data.rendered
@@ -65,6 +67,21 @@ module "nextcloud_ssh_firewall" {
   source_ip_cidrs = [module.network.network_ip_range, "${module.bastion_server.public_ip}/32"]
   generic_labels  = local.labels
 }
+
+# web
+# module "web_server" {
+#   source              = "../../modules/hcloud-server"
+#   server_image        = var.base_images.web
+#   server_type         = var.server_type.web
+#   server_name         = var.server_name.web
+#   enable_backups      = true
+#   network_id          = module.network.network_id
+#   server_private_ip   = var.private_ip_address_web
+#   firewall_ids        = module.web_firewall.web_id
+#   ssh_public_key_name = var.ssh_key_name
+#   user_data           = data.template_file.nextcloud_user_data.rendered
+#   generic_labels      = local.labels
+# }
 
 module "web_firewall" {
   source         = "../../modules/hcloud-firewall"

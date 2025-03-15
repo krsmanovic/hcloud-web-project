@@ -1,0 +1,15 @@
+[Unit]
+Description=${domain}
+After=network.target
+
+[Service]
+ExecStart=/opt/${domain}/website.js
+Restart=always
+User=nobody
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/opt/${domain}
+
+[Install]
+WantedBy=multi-user.target

@@ -14,6 +14,11 @@ users:
 package_update: true
 package_upgrade: true
 package_reboot_if_required: false
+apt:
+  preserve_sources_list: true
+  sources:
+    php.list:
+      source: "ppa:ondrej/php"
 
 # disable password authentication for root user
 ssh_pwauth: false
@@ -46,20 +51,20 @@ packages:
   # php modules
   - imagemagick
   - php-imagick
-  - php8.1-common
-  - php8.1-pgsql
-  - php8.1-fpm
-  - php8.1-gd
-  - php8.1-curl
-  - php8.1-imagick
-  - php8.1-zip
-  - php8.1-xml
-  - php8.1-mbstring
-  - php8.1-bz2
-  - php8.1-intl
-  - php8.1-bcmath
-  - php8.1-gmp
-  - php8.1-redis
+  - php${php_version}-common
+  - php${php_version}-pgsql
+  - php${php_version}-fpm
+  - php${php_version}-gd
+  - php${php_version}-curl
+  - php${php_version}-imagick
+  - php${php_version}-zip
+  - php${php_version}-xml
+  - php${php_version}-mbstring
+  - php${php_version}-bz2
+  - php${php_version}-intl
+  - php${php_version}-bcmath
+  - php${php_version}-gmp
+  - php${php_version}-redis
 
 # set hostname
 hostname: ${server_name}
@@ -106,11 +111,11 @@ runcmd:
   # fix CR LF control characters in case we originate from Windows dev machine
   - dos2unix /root/nextcloud-install.sh
   # php
-  - sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php/8.1/fpm/php.ini
-  - sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 1024M/g' /etc/php/8.1/fpm/php.ini
-  - sed -i 's/;clear_env = no/clear_env = no/g' /etc/php/8.1/fpm/pool.d/www.conf
-  - sed -i 's/pm = dynamic/pm = static/' /etc/php/8.1/fpm/pool.d/www.conf
-  - sed -i 's/pm.max_children = 5/pm.max_children = 50/' /etc/php/8.1/fpm/pool.d/www.conf
+  - sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php/${php_version}/fpm/php.ini
+  - sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 1024M/g' /etc/php/${php_version}/fpm/php.ini
+  - sed -i 's/;clear_env = no/clear_env = no/g' /etc/php/${php_version}/fpm/pool.d/www.conf
+  - sed -i 's/pm = dynamic/pm = static/' /etc/php/${php_version}/fpm/pool.d/www.conf
+  - sed -i 's/pm.max_children = 5/pm.max_children = 50/' /etc/php/${php_version}/fpm/pool.d/www.conf
   # nginx
   - rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
   - ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/

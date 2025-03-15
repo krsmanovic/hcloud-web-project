@@ -1,0 +1,103 @@
+#cloud-config
+
+# users configuration
+users:
+  - name: ${ops_user_name}
+    gecos: Operations user
+    groups: users, admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ops_public_key}
+
+# apt configuration
+package_update: true
+package_upgrade: true
+package_reboot_if_required: false
+apt:
+  preserve_sources_list: true
+  sources:
+    nodesource.list:
+      source: "deb https://deb.nodesource.com/node_18.x $RELEASE main"
+      keyid: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
+    nodesource.list.append:
+      source: "deb-src https://deb.nodesource.com/node_18.x $RELEASE main"
+      keyid: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
+
+# disable password authentication for root user
+ssh_pwauth: false
+
+# install required packages
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - dos2unix
+  - git
+  - gnupg-agent
+  - iptraf-ng
+  - jq
+  - mtr
+  - net-tools
+  - nginx
+  - nmap
+  - software-properties-common
+  - tree
+  - whois
+  - zip
+  # certbot
+  - certbot
+  - python3-certbot-nginx
+  # node
+  - gcc
+  - g++
+  - make
+  - nodejs
+  - npm
+  - yarn
+  - build-essential
+
+# set hostname
+hostname: ${server_name}
+
+# render required files
+write_files:
+- path: /tmp/website.tar
+  encoding: b64
+  content: ${website_archive}
+- path: /tmp/website.service
+  encoding: b64
+  content: ${website_service}
+- path: /etc/nginx/sites-available/krsmanovic.conf
+  encoding: b64
+  content: ${nginx_config}
+
+# execute commands on the first boot
+runcmd:
+  # root user setup
+  - echo "source /root/.profile" >> /root/.bash_profile
+  - echo "0 12 * * * /usr/bin/certbot renew --quiet" >> /var/spool/cron/crontabs/root
+  # ufw
+  - ufw allow OpenSSH
+  - ufw allow "Nginx Full"
+  - ufw --force enable
+  # sshd
+  - sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
+  - sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+  # website
+  - 
+  # nginx
+  - rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+  - ln -s /etc/nginx/sites-available/krsmanovic.conf /etc/nginx/sites-enabled/
+  - systemctl restart nginx
+  # certbot
+  #- certbot --nginx -d ${domain} --non-interactive --agree-tos -m ${cert_email} --redirect
+
+# reboot
+power_state:
+ mode: reboot
+ message: Rebooting the system to finalize software installation
+ timeout: 30
+ condition: True
+
+final_message: "*** System setup is complete, after $UPTIME seconds ***"

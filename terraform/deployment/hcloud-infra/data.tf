@@ -20,6 +20,7 @@ data "template_file" "nextcloud_user_data" {
     server_name       = var.server_name.nextcloud
     ops_public_key    = module.ssh_key.public_key
     ops_user_name     = data.aws_ssm_parameter.ssh_user_name.value
+    php_version       = var.nextcloud_php_version
     posgresql_setup   = base64encode(data.template_file.nextcloud_postgresql.rendered)
   }
 }
@@ -40,6 +41,7 @@ data "template_file" "nextcloud_install" {
     nc_mail_password   = data.aws_ssm_parameter.nextcloud_mail_password.value
     nc_mail_domain     = data.aws_ssm_parameter.nextcloud_mail_domain.value
     nc_mail_host       = data.aws_ssm_parameter.nextcloud_mail_host.value
+    php_version        = var.nextcloud_php_version
   }
 }
 
@@ -128,4 +130,40 @@ resource "random_password" "nextcloud_db_user" {
   # create cloud-init friendly password
   special          = true
   override_special = "$(%&!=+@"
+}
+
+# web
+data "template_file" "web_user_data" {
+  template = file("${path.module}/templates/web/cloud-init.yaml")
+  vars = {
+    domain            = data.aws_ssm_parameter.web_domain.value
+    website_archive   = base64encode(data.local_file.website_archive.content)
+    website_service   = base64encode(data.local_file.website_service.content)
+    nginx_config      = base64encode(data.template_file.website_nginx_config.rendered)
+    server_name       = var.server_name.web
+    ops_public_key    = module.ssh_key.public_key
+    ops_user_name     = data.aws_ssm_parameter.ssh_user_name.value
+  }
+}
+
+data "local_file" "website_archive" {
+  filename = "${path.module}/templates/web/website.tar"
+}
+
+data "template_file" "website_nginx_config" {
+  template = file("${path.module}/templates/web/nginx.conf")
+  vars = {
+    domain = data.aws_ssm_parameter.website_domain.value
+  }
+}
+
+data "template_file" "website_service" {
+  template = file("${path.module}/templates/web/website.service")
+  vars = {
+    domain = data.aws_ssm_parameter.website_domain.value
+  }
+}
+
+data "aws_ssm_parameter" "website_domain" {
+  name = "/hcloud/web-project/server/website/domain/host"
 }

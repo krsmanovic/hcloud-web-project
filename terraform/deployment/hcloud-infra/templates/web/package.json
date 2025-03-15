@@ -1,0 +1,23 @@
+{
+  "name": "krsmanovic.me",
+  "version": "0.7.2",
+  "description": "Containerized website with plain css design",
+  "main": "website.js",
+  "scripts": {
+    "start": "node website.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krsmanovic/krsmanovic.me.git"
+  },
+  "keywords": [
+    "website",
+    "krsmanovic",
+    "css"
+  ],
+  "author": "Cedomir Krsmanovic",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

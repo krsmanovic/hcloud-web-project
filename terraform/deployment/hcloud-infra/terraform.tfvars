@@ -14,4 +14,5 @@ server_type = {
   web       = "cpx11" # 2 vCPU, 2 GB RAM, 40 GB ssd, 20 TB of traffic
 }
 
-nextcloud_private_ip_address = "10.0.0.3"
+private_ip_address_nextcloud = "10.0.0.3"
+private_ip_address_web = "10.0.0.4"

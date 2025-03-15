@@ -88,6 +88,12 @@ variable "app_specific_labels" {
   default     = {}
 }
 
+variable "nextcloud_php_version" {
+  type        = string
+  description = "PHP version to install on Nextcloud server."
+  default     = "8.2"
+}
+
 variable "format_nextcloud_data_volume" {
   type        = string
   description = "Format data volume on the nextcloud server"
@@ -99,7 +105,13 @@ variable "format_nextcloud_data_volume" {
   }
 }
 
-variable "nextcloud_private_ip_address" {
+variable "private_ip_address_nextcloud" {
+  type        = string
+  description = "IP to request to be assigned to this server. If you do not provide this then you will be auto assigned an IP address."
+  default     = ""
+}
+
+variable "private_ip_address_web" {
   type        = string
   description = "IP to request to be assigned to this server. If you do not provide this then you will be auto assigned an IP address."
   default     = ""
