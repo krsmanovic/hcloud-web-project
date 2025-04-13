@@ -68,6 +68,12 @@ sudo -u www-data php occ maintenance:update:htaccess
 # set maintenance window start
 sudo -u www-data php occ config:system:set maintenance_window_start --value="3" --type=integer
 
+# maintenance ops
+sudo -u www-data php occ maintenance:repair --include-expensive
+sudo -u www-data php occ db:add-missing-indices
+sudo -u www-data php occ version:cleanup
+sudo -u www-data php occ trashbin:cleanup --all-users
+
 # set php opcache
 # https://gist.github.com/rohankhudedev/1a9c0a3c7fb375f295f9fc11aeb116fe
 cat << EOF > /etc/php/${php_version}/fpm/conf.d/99-custom.ini
