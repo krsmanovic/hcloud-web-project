@@ -133,37 +133,37 @@ resource "random_password" "nextcloud_db_user" {
 }
 
 # web
-data "template_file" "web_user_data" {
-  template = file("${path.module}/templates/web/cloud-init.yaml")
-  vars = {
-    domain            = data.aws_ssm_parameter.web_domain.value
-    website_archive   = base64encode(data.local_file.website_archive.content)
-    website_service   = base64encode(data.local_file.website_service.content)
-    nginx_config      = base64encode(data.template_file.website_nginx_config.rendered)
-    server_name       = var.server_name.web
-    ops_public_key    = module.ssh_key.public_key
-    ops_user_name     = data.aws_ssm_parameter.ssh_user_name.value
-  }
-}
+# data "template_file" "web_user_data" {
+#   template = file("${path.module}/templates/web/cloud-init.yaml")
+#   vars = {
+#     domain            = data.aws_ssm_parameter.web_domain.value
+#     website_archive   = base64encode(data.local_file.website_archive.content)
+#     website_service   = base64encode(data.local_file.website_service.content)
+#     nginx_config      = base64encode(data.template_file.website_nginx_config.rendered)
+#     server_name       = var.server_name.web
+#     ops_public_key    = module.ssh_key.public_key
+#     ops_user_name     = data.aws_ssm_parameter.ssh_user_name.value
+#   }
+# }
 
-data "local_file" "website_archive" {
-  filename = "${path.module}/templates/web/website.tar"
-}
+# data "local_file" "website_archive" {
+#   filename = "${path.module}/templates/web/website.tar"
+# }
 
-data "template_file" "website_nginx_config" {
-  template = file("${path.module}/templates/web/nginx.conf")
-  vars = {
-    domain = data.aws_ssm_parameter.website_domain.value
-  }
-}
+# data "template_file" "website_nginx_config" {
+#   template = file("${path.module}/templates/web/nginx.conf")
+#   vars = {
+#     domain = data.aws_ssm_parameter.website_domain.value
+#   }
+# }
 
-data "template_file" "website_service" {
-  template = file("${path.module}/templates/web/website.service")
-  vars = {
-    domain = data.aws_ssm_parameter.website_domain.value
-  }
-}
+# data "template_file" "website_service" {
+#   template = file("${path.module}/templates/web/website.service")
+#   vars = {
+#     domain = data.aws_ssm_parameter.website_domain.value
+#   }
+# }
 
-data "aws_ssm_parameter" "website_domain" {
-  name = "/hcloud/web-project/server/website/domain/host"
-}
+# data "aws_ssm_parameter" "website_domain" {
+#   name = "/hcloud/web-project/server/website/domain/host"
+# }
