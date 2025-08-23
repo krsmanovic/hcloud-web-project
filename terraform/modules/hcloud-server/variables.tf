@@ -7,11 +7,11 @@ variable "server_name" {
 variable "server_type" {
   type        = string
   description = "Type of standard (non-dedicated) Hetzner VPS offering"
-  default     = "cx11"
+  default     = "cx22"
 
   validation {
-    condition     = contains(["cx11", "cpx11", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type)
-    error_message = "Valid values for variable \"server_type\" are: cx11, cpx11, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type)
+    error_message = "Valid values for variable \"server_type\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
   }
 }
 
@@ -36,7 +36,7 @@ variable "hcloud_datacenter" {
 variable "server_image" {
   type        = string
   description = "Name or ID of the image the server is created from"
-  default     = "ubuntu-22.04"
+  default     = "ubuntu-24.04"
 }
 
 variable "ssh_public_key_name" {

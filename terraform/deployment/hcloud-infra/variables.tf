@@ -39,9 +39,9 @@ variable "base_images" {
   type        = map(string)
   description = "Server base images"
   default = {
-    bastion   = "ubuntu-22.04"
-    nextcloud = "ubuntu-22.04"
-    web       = "ubuntu-22.04"
+    bastion   = "ubuntu-24.04"
+    nextcloud = "ubuntu-24.04"
+    web       = "ubuntu-24.04"
   }
 }
 
@@ -49,31 +49,31 @@ variable "server_type" {
   type        = map(string)
   description = "Type of standard (non-dedicated) Hetzner VPS offering"
   default = {
-    bastion   = "cpx11" # 2 Intel vCPU cores, 2 GB RAM, 40 GB root volume size, 20 TB of traffic
-    nextcloud = "cpx11"
-    web       = "cpx11"
+    bastion   = "cpx21" # 2 Intel vCPU cores, 2 GB RAM, 40 GB root volume size, 20 TB of traffic
+    nextcloud = "cpx21"
+    web       = "cpx21"
   }
 
   validation {
-    condition     = contains(["cx11", "cpx11"], var.server_type.bastion)
-    error_message = "Valid values for variable \"server_type.bastion\" are: cx11, cpx11."
+    condition     = contains(["cx22", "cpx21"], var.server_type.bastion)
+    error_message = "Valid values for variable \"server_type.bastion\" are: cx22, cpx21."
   }
 
   validation {
-    condition     = contains(["cx11", "cpx11", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.nextcloud)
-    error_message = "Valid values for variable \"server_type.nextcloud\" are: cx11, cpx11, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.nextcloud)
+    error_message = "Valid values for variable \"server_type.nextcloud\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
   }
 
   validation {
-    condition     = contains(["cx11", "cpx11", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.web)
-    error_message = "Valid values for variable \"server_type.web\" are: cx11, cpx11, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.web)
+    error_message = "Valid values for variable \"server_type.web\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
   }
 }
 
 variable "server_base_image" {
   type        = string
   description = "Base OS image to use for server deployment"
-  default     = "ubuntu-22.04"
+  default     = "ubuntu-24.04"
 }
 
 variable "ssh_key_name" {
@@ -91,7 +91,7 @@ variable "app_specific_labels" {
 variable "nextcloud_php_version" {
   type        = string
   description = "PHP version to install on Nextcloud server."
-  default     = "8.2"
+  default     = "8.4"
 }
 
 variable "format_nextcloud_data_volume" {

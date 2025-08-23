@@ -126,8 +126,9 @@ runcmd:
   - cat /root/redis-tweak | sudo tee -a /etc/redis/redis.conf
   - rm -rf /root/redis-tweak
   - sed -i "s/^port.*/port 0/" /etc/redis/redis.conf
-  - sed -i "s|# unixsocket /var/run/redis/redis-server.sock|unixsocket /var/run/redis/redis-server.sock|" /etc/redis/redis.conf
+  - sed -i "s|# unixsocket /run/redis/redis-server.sock|unixsocket /run/redis/redis-server.sock|" /etc/redis/redis.conf
   - sed -i "s/# unixsocketperm.*/unixsocketperm 770/" /etc/redis/redis.conf
+  - sed -i "s/# supervised auto/supervised systemd/" /etc/redis/redis.conf
   - echo 'vm.overcommit_memory = 1' | sudo tee -a /etc/sysctl.conf
   # certbot
   - certbot --nginx -d ${domain} --non-interactive --agree-tos -m ${cert_email} --redirect
