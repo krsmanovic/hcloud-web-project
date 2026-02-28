@@ -65,6 +65,7 @@ packages:
   - php${php_version}-bcmath
   - php${php_version}-gmp
   - php${php_version}-redis
+  - php${php_version}-apcu
 
 # set hostname
 hostname: ${server_name}
