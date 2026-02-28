@@ -7,11 +7,11 @@ variable "server_name" {
 variable "server_type" {
   type        = string
   description = "Type of standard (non-dedicated) Hetzner VPS offering"
-  default     = "cx22"
+  default     = "cx23"
 
   validation {
-    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type)
-    error_message = "Valid values for variable \"server_type\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx23", "cpx22", "cpx22", "cx33", "cpx32", "cx43", "cpx42", "cx53", "cpx52"], var.server_type)
+    error_message = "Valid values for variable \"server_type\" are: cx23, cpx22, cx23, cpx22, cx33, cpx32, cx43, cpx42, cx53, cpx52."
   }
 }
 

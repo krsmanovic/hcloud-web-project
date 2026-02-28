@@ -49,24 +49,24 @@ variable "server_type" {
   type        = map(string)
   description = "Type of standard (non-dedicated) Hetzner VPS offering"
   default = {
-    bastion   = "cpx21" # 2 Intel vCPU cores, 2 GB RAM, 40 GB root volume size, 20 TB of traffic
-    nextcloud = "cpx21"
-    web       = "cpx21"
+    bastion   = "cpx22" # 2 Intel vCPU cores, 2 GB RAM, 40 GB root volume size, 20 TB of traffic
+    nextcloud = "cpx22"
+    web       = "cpx22"
   }
 
   validation {
-    condition     = contains(["cx22", "cpx21"], var.server_type.bastion)
-    error_message = "Valid values for variable \"server_type.bastion\" are: cx22, cpx21."
+    condition     = contains(["cx23", "cpx22"], var.server_type.bastion)
+    error_message = "Valid values for variable \"server_type.bastion\" are: cx23, cpx22."
   }
 
   validation {
-    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.nextcloud)
-    error_message = "Valid values for variable \"server_type.nextcloud\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx23", "cpx22", "cpx22", "cx33", "cpx32", "cx43", "cpx42", "cx53", "cpx52"], var.server_type.nextcloud)
+    error_message = "Valid values for variable \"server_type.nextcloud\" are: cx23, cpx22, cx23, cpx22, cx33, cpx32, cx43, cpx42, cx53, cpx52."
   }
 
   validation {
-    condition     = contains(["cx22", "cpx21", "cx21", "cpx21", "cx31", "cpx31", "cx41", "cpx41", "cx51", "cpx51"], var.server_type.web)
-    error_message = "Valid values for variable \"server_type.web\" are: cx22, cpx21, cx21, cpx21, cx31, cpx31, cx41, cpx41, cx51, cpx51."
+    condition     = contains(["cx23", "cpx22", "cpx22", "cx33", "cpx32", "cx43", "cpx42", "cx53", "cpx52"], var.server_type.web)
+    error_message = "Valid values for variable \"server_type.web\" are: cx23, cpx22, cx23, cpx22, cx33, cpx32, cx43, cpx42, cx53, cpx52."
   }
 }
 

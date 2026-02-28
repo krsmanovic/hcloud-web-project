@@ -9,9 +9,9 @@ base_images = {
 }
 
 server_type = {
-  bastion   = "cx22"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
-  nextcloud = "cx22"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
-  web       = "cx22"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
+  bastion   = "cx23"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
+  nextcloud = "cx23"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
+  web       = "cx23"  # 2 vCPU, 4 GB RAM, 40 GB ssd, 20 TB of traffic
 }
 
 private_ip_address_nextcloud = "10.0.0.3"
