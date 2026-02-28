@@ -91,7 +91,7 @@ variable "app_specific_labels" {
 variable "nextcloud_php_version" {
   type        = string
   description = "PHP version to install on Nextcloud server."
-  default     = "8.4"
+  default     = "8.5"
 }
 
 variable "format_nextcloud_data_volume" {
