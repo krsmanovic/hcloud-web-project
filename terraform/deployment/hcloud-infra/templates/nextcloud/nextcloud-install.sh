@@ -59,7 +59,7 @@ sed -i "/);/i\  'mail_smtpmode' => 'smtp',\n  'mail_smtphost' => '${nc_mail_host
 
 # configure redis cache
 usermod -a -G redis www-data
-sed -i "/);/i\  'filelocking.enabled' => true,\n  'memcache.locking' => '\\\OC\\\Memcache\\\Redis',\n  'memcache.local' =>'\\\OC\\\Memcache\\\Redis',\n  'redis' => array(\n     'host'    => '/var/run/redis/redis-server.sock',\n     'port'    => 0,\n     'timeout' => 0.0,\n     'dbindex' => 0,\n  )," /var/www/nextcloud/config/config.php
+sed -i "/);/i\  'filelocking.enabled' => true,\n  'memcache.locking' => '\\\OC\\\Memcache\\\Redis',\n  'memcache.local' =>'\\\OC\\\Memcache\\\Redis',\n  'redis' => array(\n     'host'    => '/run/redis/redis-server.sock',\n     'port'    => 0,\n     'timeout' => 0.0,\n     'dbindex' => 0,\n  )," /var/www/nextcloud/config/config.php
 
 # add Strict-Transport-Security headers
 sed -i '/    Header always set X-XSS-Protection "1; mode=block"/a\    # Security hardening\n    Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains"' /var/www/nextcloud/.htaccess
