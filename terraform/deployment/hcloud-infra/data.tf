@@ -48,7 +48,8 @@ data "template_file" "nextcloud_install" {
 data "template_file" "nextcloud_nginx_config" {
   template = file("${path.module}/templates/nextcloud/nginx.conf")
   vars = {
-    domain = data.aws_ssm_parameter.nextcloud_domain.value
+    domain      = data.aws_ssm_parameter.nextcloud_domain.value
+    php_version = var.nextcloud_php_version
   }
 }
 
