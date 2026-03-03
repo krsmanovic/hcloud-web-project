@@ -94,6 +94,16 @@ write_files:
     maxmemory 1000M
     # how redis will evice old objects - least recently used
     maxmemory-policy allkeys-lru
+- path: /root/set-swap.sh
+  permissions: "0755"
+  content: |
+    #!/bin/bash
+    mkdir -p /var/cache/swap || true
+    dd if=/dev/zero of=/var/cache/swap/swapfile bs=1K count=4M
+    chmod 600 /var/cache/swap/swapfile
+    mkswap /var/cache/swap/swapfile
+    swapon /var/cache/swap/swapfile
+    dd status=none oflag=append conv=notrunc of=/etc/fstab <<< "/var/cache/swap/swapfile none swap sw 0 0"
 
 # execute commands on the first boot
 runcmd:
@@ -107,6 +117,8 @@ runcmd:
   # sshd
   - sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config
   - sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+  # enable swap
+  - /root/set-swap.sh
   # posgresl
   - sudo -u postgres psql -U postgres postgres -a -f /tmp/pg.sql
   # fix CR LF control characters in case we originate from Windows dev machine
