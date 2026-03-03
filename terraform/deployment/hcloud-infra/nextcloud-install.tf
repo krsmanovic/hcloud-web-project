@@ -24,8 +24,7 @@ resource "null_resource" "nextcloud_install" {
       bastion_host = module.bastion_server.public_ip
     }
     inline = [
-      "sudo bash -c '/root/nextcloud-install.sh'",
-      "sudo bash -c 'rm -rf /root/nextcloud-install.sh'",
+      "sudo bash -c '/root/install/nextcloud-install.sh'",
       "sudo bash -c 'shutdown -r +0'",
     ]
   }
